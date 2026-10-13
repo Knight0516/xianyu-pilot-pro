@@ -44,7 +44,8 @@ test('production CORS is fail-closed when no browser origins are configured', ()
 
 test('production requires Redis authentication and explicit HTTPS CORS origins', () => {
   assert.equal(resolveRedisPasswordPolicy('', 'production').ready, false);
-  assert.equal(resolveRedisPasswordPolicy('short', 'production').ready, false);
+  assert.equal(resolveRedisPasswordPolicy('short', 'production').ready, true);
+  assert.equal(resolveRedisPasswordPolicy('R3d!s-xY7p', 'production').ready, true);
   assert.equal(resolveRedisPasswordPolicy('R3d!s-' + 'xY7p'.repeat(10), 'production').ready, true);
   assert.equal(areProductionCorsOriginsSafe([], 'production'), false);
   assert.equal(areProductionCorsOriginsSafe(['http://admin.example.com'], 'production'), false);

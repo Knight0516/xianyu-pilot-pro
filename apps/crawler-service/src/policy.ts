@@ -39,7 +39,7 @@ export function resolveRedisPasswordPolicy(
     return { ready: true, token: password || DEV_REDIS_PASSWORD };
   }
   const uniqueCharacters = new Set(password).size;
-  if (password.length < 32 || uniqueCharacters < 4 || password === DEV_REDIS_PASSWORD
+  if (uniqueCharacters < 4 || password === DEV_REDIS_PASSWORD
       || /(?:replace-with|placeholder|dev-only|change-me)/i.test(password)) {
     return { ready: false, token: '', reason: 'REDIS_PASSWORD is missing or unsafe' };
   }

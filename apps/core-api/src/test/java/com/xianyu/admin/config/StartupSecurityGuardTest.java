@@ -60,6 +60,22 @@ class StartupSecurityGuardTest {
     }
 
     @Test
+    void productionAcceptsRedisPasswordShorterThan32Characters() {
+        MockEnvironment environment = secureProductionEnvironment();
+        environment.setProperty("spring.data.redis.password", "R3d!s-xY7p");
+
+        assertDoesNotThrow(() -> new StartupSecurityGuard(environment).run(args()));
+    }
+
+    @Test
+    void productionAcceptsMySqlPasswordShorterThan32Characters() {
+        MockEnvironment environment = secureProductionEnvironment();
+        environment.setProperty("spring.datasource.password", "Mys!qL-7xP");
+
+        assertDoesNotThrow(() -> new StartupSecurityGuard(environment).run(args()));
+    }
+
+    @Test
     void productionRequiresExplicitAiProviderHostRules() {
         MockEnvironment missing = secureProductionEnvironment();
         missing.setProperty("xianyu.ai.provider.allowed-hosts", "");

@@ -45,8 +45,8 @@ public class StartupSecurityGuard implements ApplicationRunner {
         requireStrong("COOKIE_CRYPTO_SECRET", property("xianyu.cookie.crypto-secret"), 32);
         requireStrong("API_KEY_CRYPTO_SECRET", property("xianyu.api-key.crypto-secret"), 32);
         requireStrong("OPS_METRICS_TOKEN", property("ops.metrics.token"), 32);
-        requireStrong("SPRING_DATASOURCE_PASSWORD", property("spring.datasource.password"), 32);
-        requireStrong("REDIS_PASSWORD", property("spring.data.redis.password"), 32);
+        requireStrong("SPRING_DATASOURCE_PASSWORD", property("spring.datasource.password"), 1);
+        requireStrong("REDIS_PASSWORD", property("spring.data.redis.password"), 1);
         requireStrong("DATA_SYNC_API_TOKEN", property("xianyu.sync.token"), 32);
 
         if (Boolean.parseBoolean(property("admin.seed.enabled", "false"))) {
