@@ -3,8 +3,8 @@ import assert from 'node:assert/strict'
 import { resolveLegalConfig } from '../src/utils/legalConfig.js'
 
 assert.deepEqual(resolveLegalConfig({}), {
-  termsUrl: '',
-  privacyUrl: '',
+  termsUrl: '/legal/terms.html',
+  privacyUrl: '/legal/privacy.html',
   icpLicense: '',
 })
 

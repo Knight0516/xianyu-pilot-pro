@@ -127,7 +127,7 @@
         </button>
       </div>
 
-      <button class="auth-submit" type="submit" :disabled="loading || authCapabilityLoading || !activeLoginCapability.available || !legalDocumentsAvailable">
+      <button class="auth-submit" type="submit" :disabled="loading || authCapabilityLoading || !activeLoginCapability.available">
         {{ loading ? '登录中...' : tab === 'password' ? '登录' : '立即登录' }}
       </button>
     </form>
@@ -172,9 +172,9 @@
       </button>
     </div>
 
-    <div class="auth-agreement">
+    <div v-if="legalDocumentsAvailable" class="auth-agreement">
       <label class="auth-check auth-check-agreement">
-        <input v-model="agreed" type="checkbox" :disabled="!legalDocumentsAvailable" />
+        <input v-model="agreed" type="checkbox" />
         <span>
           我已阅读并同意
           <button type="button" class="auth-text-link" :disabled="!legalConfig.termsUrl" @click="openDoc('用户协议')">《用户协议》</button>
@@ -182,9 +182,6 @@
           <button type="button" class="auth-text-link" :disabled="!legalConfig.privacyUrl" @click="openDoc('隐私政策')">《隐私政策》</button>
         </span>
       </label>
-      <p v-if="!legalDocumentsAvailable" class="auth-legal-unavailable" role="status">
-        用户协议或隐私政策链接未配置，当前无法完成登录，请联系部署方。
-      </p>
     </div>
   </AuthShell>
 
@@ -308,8 +305,8 @@
         </div>
       </template>
 
-      <label class="mobile-auth-agreement">
-        <input v-model="agreed" type="checkbox" :disabled="!legalDocumentsAvailable" />
+      <label v-if="legalDocumentsAvailable" class="mobile-auth-agreement">
+        <input v-model="agreed" type="checkbox" />
         <span>
           我已阅读并同意
           <button type="button" class="mobile-auth-text-link" :disabled="!legalConfig.termsUrl" @click="openDoc('用户协议')">《用户协议》</button>
@@ -317,14 +314,10 @@
           <button type="button" class="mobile-auth-text-link" :disabled="!legalConfig.privacyUrl" @click="openDoc('隐私政策')">《隐私政策》</button>
         </span>
       </label>
-      <p v-if="!legalDocumentsAvailable" class="mobile-auth-legal-unavailable" role="status">
-        用户协议或隐私政策链接未配置，当前无法完成登录。
-      </p>
-
       <button
         class="mobile-auth-primary-button"
         type="submit"
-        :disabled="loading || authCapabilityLoading || !legalDocumentsAvailable"
+        :disabled="loading || authCapabilityLoading || !activeLoginCapability.available"
       >
         {{ loading ? '登录中...' : '立即登录' }}
       </button>
@@ -424,18 +417,6 @@ function openDoc(title) {
   if (!result.opened) errorMsg.value = result.message
 }
 
-function ensureAgreed() {
-  if (!legalDocumentsAvailable) {
-    errorMsg.value = '用户协议或隐私政策链接未配置，当前无法完成登录'
-    return false
-  }
-  if (!agreed.value) {
-    errorMsg.value = '请先阅读并同意用户协议和隐私政策'
-    return false
-  }
-  return true
-}
-
 function switchTab(nextTab) {
   // 允许自由切换 tab，仅作为视图切换；表单提交时才校验能力
   tab.value = nextTab
@@ -447,8 +428,6 @@ async function handleLogin() {
   errorMsg.value = ''
 
   if (!activeLoginCapability.value.available) return
-
-  if (!ensureAgreed()) return
 
   if (tab.value === 'password') {
     if (!username.value.trim()) {

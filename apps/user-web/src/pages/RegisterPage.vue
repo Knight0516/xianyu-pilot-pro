@@ -115,9 +115,9 @@
           />
         </label>
 
-        <div class="auth-agreement">
-          <label class="auth-check auth-check-register auth-check-agreement" :class="{ 'has-error': fieldErrors.agreed }">
-            <input v-model="form.agreed" type="checkbox" :disabled="!legalDocumentsAvailable" @change="blurAgreed" />
+        <div v-if="legalDocumentsAvailable" class="auth-agreement">
+          <label class="auth-check auth-check-register auth-check-agreement">
+            <input v-model="form.agreed" type="checkbox" />
             <span>
               我已阅读并同意
               <button type="button" class="auth-text-link" :disabled="!legalConfig.termsUrl" @click="openDoc('用户协议')">《用户协议》</button>
@@ -125,13 +125,9 @@
               <button type="button" class="auth-text-link" :disabled="!legalConfig.privacyUrl" @click="openDoc('隐私政策')">《隐私政策》</button>
             </span>
           </label>
-          <span v-if="fieldErrors.agreed" class="auth-field-error">{{ fieldErrors.agreed }}</span>
-          <p v-if="!legalDocumentsAvailable" class="auth-legal-unavailable" role="status">
-            用户协议或隐私政策链接未配置，当前无法完成注册，请联系部署方。
-          </p>
         </div>
 
-        <button class="auth-submit" type="submit" :disabled="loading || !legalDocumentsAvailable">
+        <button class="auth-submit" type="submit" :disabled="loading">
           {{ loading ? '注册中...' : '立即注册' }}
         </button>
       </form>
@@ -251,8 +247,8 @@
           />
         </label>
 
-        <label class="mobile-auth-agreement">
-          <input v-model="form.agreed" type="checkbox" :disabled="!legalDocumentsAvailable" />
+        <label v-if="legalDocumentsAvailable" class="mobile-auth-agreement">
+          <input v-model="form.agreed" type="checkbox" />
           <span>
             我已阅读并同意
             <button type="button" class="mobile-auth-text-link" :disabled="!legalConfig.termsUrl" @click="openDoc('用户协议')">《用户协议》</button>
@@ -260,14 +256,10 @@
             <button type="button" class="mobile-auth-text-link" :disabled="!legalConfig.privacyUrl" @click="openDoc('隐私政策')">《隐私政策》</button>
           </span>
         </label>
-        <p v-if="!legalDocumentsAvailable" class="mobile-auth-legal-unavailable" role="status">
-          用户协议或隐私政策链接未配置，当前无法完成注册。
-        </p>
-
         <button
           class="mobile-auth-primary-button"
           type="submit"
-          :disabled="loading || !legalDocumentsAvailable"
+          :disabled="loading"
         >
           {{ loading ? '注册中...' : '完成注册' }}
         </button>
@@ -306,16 +298,10 @@ const emit = defineEmits(['navigate', 'login-success'])
 const {
   authCapabilities,
   authCapabilityLoading,
-  authCapabilityError,
   refreshAuthCapabilities,
 } = useAuthCapabilities()
 const selfRegistrationCapability = computed(() => authCapabilities.value.selfRegistration)
 const emailLoginCapability = computed(() => authCapabilities.value.emailVerification)
-const authUnavailableMessage = computed(() => authCapabilityError.value || selfRegistrationCapability.value.reason)
-const authSupportMessage = computed(() => {
-  const support = String(authCapabilities.value.supportMessage || '').trim()
-  return support && support !== authUnavailableMessage.value ? support : ''
-})
 
 const form = reactive({
   email: '',
@@ -352,7 +338,6 @@ const fieldErrors = reactive({
   emailCode: '',
   password: '',
   confirmPassword: '',
-  agreed: ''
 })
 
 // 移动端检测
@@ -406,10 +391,6 @@ function blurConfirmPassword() {
   fieldErrors.confirmPassword = form.confirmPassword === form.password ? '' : '两次输入的密码不一致'
 }
 
-function blurAgreed() {
-  fieldErrors.agreed = form.agreed ? '' : '请先阅读并同意用户协议和隐私政策'
-}
-
 function scrollToError() {
   const fieldErr = document.querySelector('.auth-field-error')
   if (fieldErr && typeof fieldErr.scrollIntoView === 'function') {
@@ -436,12 +417,10 @@ function validatePassword(password) {
 }
 
 function validateForm() {
-  if (!legalDocumentsAvailable) return '用户协议或隐私政策链接未配置，当前无法完成注册'
   if (!validateEmail(form.email)) return '请输入正确的邮箱'
   if (!form.emailCode.trim()) return '请输入邮箱验证码'
   if (!validatePassword(form.password)) return '密码需为 8-32 位，且包含字母和数字'
   if (form.password !== form.confirmPassword) return '两次输入的密码不一致'
-  if (!form.agreed) return '请先阅读并同意用户协议和隐私政策'
   return ''
 }
 
@@ -498,7 +477,6 @@ async function submitRegister() {
   blurEmailCode()
   blurPassword()
   blurConfirmPassword()
-  blurAgreed()
   errorMsg.value = validateForm()
   if (errorMsg.value || loading.value) {
     if (errorMsg.value) {

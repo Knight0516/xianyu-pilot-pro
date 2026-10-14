@@ -13,8 +13,8 @@ function normalizeDocumentUrl(value) {
 
 export function resolveLegalConfig(env = {}) {
   return {
-    termsUrl: normalizeDocumentUrl(env.VITE_TERMS_URL),
-    privacyUrl: normalizeDocumentUrl(env.VITE_PRIVACY_URL),
+    termsUrl: normalizeDocumentUrl(env.VITE_TERMS_URL || '/legal/terms.html'),
+    privacyUrl: normalizeDocumentUrl(env.VITE_PRIVACY_URL || '/legal/privacy.html'),
     icpLicense: String(env.VITE_ICP_LICENSE || '').trim(),
   }
 }

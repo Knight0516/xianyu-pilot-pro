@@ -69,7 +69,6 @@
       <button type="button" class="auth-footer-link" :disabled="!legalConfig.termsUrl" @click="openDoc('用户协议')">
         {{ legalConfig.termsUrl ? '用户协议' : '用户协议（未配置）' }}
       </button>
-      <span v-if="!legalDocumentsAvailable" class="auth-footer-status" role="status">协议链接未配置</span>
     </footer>
   </div>
 </template>
@@ -79,7 +78,7 @@ import { computed, onMounted, onBeforeUnmount, ref } from 'vue'
 import AuthIcon from './AuthIcon.vue'
 import { forgotFeatures, loginFeatures, openLegalDoc, registerFeatures, authStats } from './authContent.js'
 import { getCopyrightYear } from '../../utils/appMeta.js'
-import { hasRequiredLegalDocuments, LEGAL_CONFIG } from '../../utils/legalConfig.js'
+import { LEGAL_CONFIG } from '../../utils/legalConfig.js'
 
 const props = defineProps({
   pageKey: { type: String, required: true },
@@ -97,7 +96,6 @@ const props = defineProps({
 const emit = defineEmits(['navigate'])
 const resolvedCopyrightYear = computed(() => `${props.copyrightYear ?? getCopyrightYear()}`)
 const legalConfig = LEGAL_CONFIG
-const legalDocumentsAvailable = hasRequiredLegalDocuments(legalConfig)
 const motionReady = ref(false)
 const motionRunning = ref(false)
 
